@@ -19,6 +19,18 @@ class LocationRepository extends ServiceEntityRepository
         parent::__construct($registry, Location::class);
     }
 
+    public function findClosest($lat, $long)
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->select('l')
+            ->addSelect('((ACOS(SIN(:lat * PI() / 180) * SIN(l.latitude * PI() / 180) + COS(:lat * PI() / 180) * COS(l.latitude * PI() / 180) * COS((:lng - l.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance')
+            ->orderBy('distance')
+            ->setParameter('lat', $lat)
+            ->setParameter('lng', $long);
+
+            return $qb->getQuery()->getResult();
+    }
+
     // /**
     //  * @return Location[] Returns an array of Location objects
     //  */

@@ -16,3 +16,9 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+        dql:
+            numeric_functions:
+                acos: App\DQL\Acos
+                sin: App\DQL\Sin
+                cos: App\DQL\Cos
+                pi: App\DQL\Pi

@@ -52,4 +52,15 @@ class LocationController extends AbstractFOSRestController
         return $location;
 
     }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/api/location/nearest/{longitude}/{latitude}", name="location_nearest")
+     */
+    public function nearestLocation(Request $request, $longitude, $latitude)
+    {
+        $locations = $this->getDoctrine()->getRepository(Location::class)->findClosest($latitude, $longitude);
+
+        return $locations;
+    }
 }
