@@ -4,9 +4,12 @@ namespace App\Entity\LocationManagement;
 
 use App\Repository\LocationManagement\LocationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass=LocationRepository::class)
+ * @Vich\Uploadable
  */
 class Location
 {
@@ -36,6 +39,21 @@ class Location
      * @ORM\Column(type="string", length=50)
      */
     private $latitude;
+
+    /**
+     * @Vich\UploadableField(mapping="location_images", fileNameProperty="imageName")
+     */
+    private $imageFile;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $imageName;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
 
     public function getId(): ?int
     {
@@ -88,5 +106,28 @@ class Location
         $this->latitude = $latitude;
 
         return $this;
+    }
+
+    public function setImageFile($imageFile)
+    {
+        $this->imageFile = $imageFile;
+
+        if(null !== $imageFile){
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageName($imageName)
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(){
+        return $this->imageName;
     }
 }
