@@ -35,15 +35,14 @@ class UserController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/api/user", name="user_get")
+     * @Rest\Get("/api/user/{email}", name="user_get")
      */
-    public function user(Request $request)
+    public function user(Request $request, $email)
     {
-        $userMail = $request->get('email');
 
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $userMail]);
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => urldecode($email)]);
 
-        
+        return $user;
     }
 
     /**

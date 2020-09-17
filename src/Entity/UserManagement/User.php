@@ -6,9 +6,12 @@ use App\Repository\UserManagement\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @Vich\Uploadable
  */
 class User implements UserInterface
 {
@@ -64,6 +67,31 @@ class User implements UserInterface
      * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $apiToken;
+
+    /**
+     * @Vich\UploadableField(mapping="user_avatar", fileNameProperty="imageName")
+     */
+    private $imageFile;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $imageName;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $address;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $city;
 
     public function getId(): ?int
     {
@@ -174,5 +202,41 @@ class User implements UserInterface
 
     public function setLastName(string $lastName){
         $this->lastName = $lastName;
+    }
+
+    public function getImageFile(){
+        return $this->imageFile;
+    }
+
+    public function setImageFile($imageFile){
+        $this->imageFile = $imageFile;
+
+        if(null !== $imageFile){
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageName(){
+        return $this->imageName;
+    }
+
+    public function setImageName($imageName){
+        $this->imageName = $imageName;
+    }
+
+    public function getAddress(){
+        return $this->address;
+    }
+
+    public function setAddress($address){
+        $this->address = $address;
+    }
+
+    public function getCity(){
+        return $this->city;
+    }
+
+    public function setCity($city){
+        $this->city = $city;
     }
 }
