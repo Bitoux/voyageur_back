@@ -3,6 +3,8 @@
 namespace App\Entity\LocationManagement;
 
 use App\Repository\LocationManagement\LocationRepository;
+use App\Entity\LocationManagement\Category;
+
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -54,6 +56,11 @@ class Location
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="locations")
+     */
+    private $category;
 
     public function getId(): ?int
     {
@@ -129,5 +136,13 @@ class Location
 
     public function getImageName(){
         return $this->imageName;
+    }
+
+    public function getCategory(){
+        return $this->category;
+    }
+
+    public function setCategory($category){
+        $this->category = $category;
     }
 }

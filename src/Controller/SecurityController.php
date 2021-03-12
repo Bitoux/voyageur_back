@@ -16,7 +16,7 @@ class SecurityController extends AbstractController
     public function apiLogin()
     {
         $user = $this->getUser();
-
+        dump($user);
         return new Response([
             'user' => $user
         ]);
