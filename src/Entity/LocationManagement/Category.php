@@ -4,6 +4,7 @@ namespace App\Entity\LocationManagement;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\LocationManagement\Location;
+use App\Entity\LocationManagement\Color;
 use App\Repository\LocationManagement\CategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -35,7 +36,8 @@ class Category
     private $icon;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\OneToOne(targetEntity="Color")
+     * @ORM\JoinColumn(name="color_id", referencedColumnName="id")
      */
     private $color;
 
