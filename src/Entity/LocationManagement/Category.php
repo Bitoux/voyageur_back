@@ -31,11 +31,6 @@ class Category
     private $tag;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $icon;
-
-    /**
      * @ORM\OneToOne(targetEntity="Color")
      * @ORM\JoinColumn(name="color_id", referencedColumnName="id")
      */
@@ -46,8 +41,14 @@ class Category
      */
     private $locations;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active;
+
     public function __construct() {
         $this->locations = new ArrayCollection();
+        $this->active = true;
     }
 
     public function getId(): ?int
@@ -77,16 +78,6 @@ class Category
         $this->tag = $tag;
 
         return $this;
-    }
-
-    public function getIcon()
-    {
-        return $this->icon;
-    }
-
-    public function setIcon($icon)
-    {
-        $this->icon = $icon;
     }
 
     public function getColor()
@@ -120,5 +111,13 @@ class Category
                 $location->setCategory(null);
             }
         }
+    }
+
+    public function isActive(){
+        return $this->active;
+    }
+
+    public function setActive($active){
+        $this->active = $active;
     }
 }

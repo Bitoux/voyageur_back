@@ -62,6 +62,15 @@ class Location
      */
     private $category;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active;
+
+    public function __construct(){
+        $this->active = true;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -144,5 +153,13 @@ class Location
 
     public function setCategory($category){
         $this->category = $category;
+    }
+
+    public function isActive(){
+        return $this->active;
+    }
+
+    public function setActive($active){
+        $this->active = $active;
     }
 }

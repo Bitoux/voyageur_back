@@ -94,7 +94,7 @@ class UserController extends AbstractFOSRestController
             ]);
 
         }else{
-            throw new HttpException(400, 'Aucun email n\'a été trouvé');
+            throw new HttpException(404, 'Aucun email n\'a été trouvé');
         }
     }
     

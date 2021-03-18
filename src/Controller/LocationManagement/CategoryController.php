@@ -19,13 +19,13 @@ class CategoryController extends AbstractFOSRestController
      */
     public function index()
     {
-        $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
+        $categories = $this->getDoctrine()->getRepository(Category::class)->findBy([
+            'active' => true
+        ]);
         if($categories){
             return $categories;
         }else{
-            return [
-                'empty_data' => true
-            ];
+            throw HttpException(404, 'No data found');
         }
     }
 
@@ -43,8 +43,7 @@ class CategoryController extends AbstractFOSRestController
 
         if($form->isValid()){
             $em = $this->getDoctrine()->getManager();
-            $category->setTag(\strtolower(preg_replace('/\s+/', '-', $category->getName())));
-            $category->setIcon('ez');
+            $category->setTag(\mb_strtolower(preg_replace('/\s+/', '-', $category->getName()), 'UTF-8'));
             $em->persist($category);
             $em->flush();
 
@@ -52,5 +51,35 @@ class CategoryController extends AbstractFOSRestController
         }
 
         throw new HttpException(500, 'Erreur survenue');
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/api/category/{id}", name="category_single")
+     */
+    public function singleCategory(Request $request, $id)
+    {
+        $category = $this->getDoctrine()->getRepository(Category::class)->findOneBy([
+            'id' => $id
+        ]);
+
+        if($category){
+            return $category;
+        }else{
+            throw HttpException(404, 'No data found');
+        }
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Put("/api/category/edit", name="category_edit")
+     */
+    public function editCategory(Request $request)
+    {
+        $category = $this->getDoctrine()->getRepository(Category::class)->findOneBy([
+            'id' => $request->request->get('id')
+        ]);
+
+        dump($category);
     }
 }

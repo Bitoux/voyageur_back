@@ -93,6 +93,15 @@ class User implements UserInterface
      */
     private $city;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active;
+
+    public function __contruct(){
+        $this->active = true;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -238,5 +247,13 @@ class User implements UserInterface
 
     public function setCity($city){
         $this->city = $city;
+    }
+
+    public function isActive(){
+        return $this->active;
+    }
+
+    public function setActive($active){
+        $this->active = $active;
     }
 }

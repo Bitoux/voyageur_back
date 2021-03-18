@@ -6,8 +6,10 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 use App\Entity\LocationManagement\Location;
+use App\Form\LocationManagement\LocationType;
 use App\Utils\UploadedBase64File;
 use App\Utils\Base64FileExtractor;
 
@@ -20,13 +22,13 @@ class LocationController extends AbstractFOSRestController
     public function index()
     {
 
-        $locations = $this->getDoctrine()->getRepository(Location::class)->findAll();
+        $locations = $this->getDoctrine()->getRepository(Location::class)->findBy([
+            'active' => true
+        ]);
         if($locations){
             return $locations;
         }else{
-            return [
-                'empty_data' => true
-            ];
+            throw HttpException(404, 'No data found');
         }
         
     }
@@ -39,21 +41,23 @@ class LocationController extends AbstractFOSRestController
     {
         $location = new Location();
 
-        $form = $this->createForm(Location::class, $location);
+        $form = $this->createForm(LocationType::class, $location);
 
         $form->submit($request->request->all());
 
         if($form->isValid()){
-            $base64Image = $request->request->get('file');
-            $base64Image = $base64Extractor->extractBase64String($base64Image);
-            $imageFile = new UploadedBase64File($base64Image, 'youhou');
-            $location->setImageFile($imageFile);
+            // $base64Image = $request->request->get('file');
+            // $base64Image = $base64Extractor->extractBase64String($base64Image);
+            // $imageFile = new UploadedBase64File($base64Image, 'youhou');
+            // $location->setImageFile($imageFile);
             $em = $this->getDoctrine()->getManager();
             $em->persist($location);
             $em->flush();
 
             return $location;
         }
+
+        return $form->getErrors();
     }
 
     /**
@@ -66,8 +70,11 @@ class LocationController extends AbstractFOSRestController
             'id' => $id
         ]);
         
-        return $location;
-
+        if($location){
+            return $location;
+        }else{
+            throw HttpException(404, 'No data found');
+        }
     }
 
     /**
@@ -78,6 +85,37 @@ class LocationController extends AbstractFOSRestController
     {
         $locations = $this->getDoctrine()->getRepository(Location::class)->findClosest($latitude, $longitude);
 
-        return $locations;
+        if($locations){
+            return $locations;
+        }else{
+            throw HttpException(404, 'No data found');
+        }
+
+        
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Delete("/api/location/delete/{id}", name="location_delete")
+     */
+    public function deleteLocation(Request $request, $id)
+    {
+        $location = $this->getDoctrine()->getRepository(Location::class)->findOneBy(array(
+            'id' => $id,
+            'active' => true
+        ));
+
+        if($location){
+            $location->setActive(false);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($location);
+            $em->flush();
+
+            return $location;
+
+        }else{
+            throw HttpException(404, 'No data found');
+        }
     }
 }
