@@ -17,7 +17,7 @@ class CategoryController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/api/category/list", name="category_list")
      */
-    public function index()
+    public function index(Request $request)
     {
         $categories = $this->getDoctrine()->getRepository(Category::class)->findBy([
             'active' => true
@@ -80,6 +80,23 @@ class CategoryController extends AbstractFOSRestController
             'id' => $request->request->get('id')
         ]);
 
-        dump($category);
+        if($category){
+            $form = $this->createForm(CategoryType::class, $category);
+
+            $form->submit($request->request->all());
+
+            if($form->isValid()){
+                $em = $this->getDoctrine()->getManager();
+                $category->setTag(\mb_strtolower(preg_replace('/\s+/', '-', $category->getName()), 'UTF-8'));
+                $em->persist($category);
+                $em->flush();
+
+                return $category;
+            }else{
+                throw new HttpException(500, $form->getErrors());
+            }
+        }else{
+            throw new HttpException(404, 'Not found');
+        }
     }
 }

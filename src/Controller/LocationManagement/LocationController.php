@@ -19,7 +19,7 @@ class LocationController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/api/location/list", name="location_list")
      */
-    public function index()
+    public function index(Request $request)
     {
 
         $locations = $this->getDoctrine()->getRepository(Location::class)->findBy([
@@ -30,6 +30,25 @@ class LocationController extends AbstractFOSRestController
         }else{
             throw HttpException(404, 'No data found');
         }
+        
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/api/location/list", name="filtered_list")
+     */
+    public function filteredList(Request $request)
+    {
+        $locations = $this->getDoctrine()->getRepository(Location::class)->findBy([
+            'category' => $request->request->all()
+        ]);
+
+        if($locations){
+            return $locations;
+        }else{
+            throw HttpException(404, 'Not found');
+        }
+
         
     }
 
@@ -62,7 +81,7 @@ class LocationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/api/location/{id}", name="location_single")
+     * @Rest\Get("/api/location/single/{id}", name="location_single")
      */
     public function singleLocation(Request $request, $id)
     {
@@ -116,6 +135,35 @@ class LocationController extends AbstractFOSRestController
 
         }else{
             throw HttpException(404, 'No data found');
+        }
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Put("/api/location/edit", name="location_edit")
+     */
+    public function editLocation(Request $request)
+    {
+        $location = $this->getDoctrine()->getRepository(Location::class)->findOneBy([
+            'id' => $request->request->get('id')
+        ]);
+
+        if($location){
+            $form = $this->createForm(LocationType::class, $location);
+
+            $form->submit($request->request->all());
+
+            if($form->isValid()){
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($location);
+                $em->flush();
+
+                return $location;
+            }else{
+                throw new HttpException(500, $form->getErrors());
+            }
+        }else{
+            throw new HttpException(404, 'Not found');
         }
     }
 }
